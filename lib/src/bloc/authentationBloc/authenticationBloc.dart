@@ -7,7 +7,7 @@ import 'package:user_repository/user_repository.dart';
 import 'authenticationEvent.dart';
 import 'authenticationState.dart';
 
-class  AuthenticationBloc
+class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
 //  final AuthenticationBloc authenticationBloc;
 ////  AuthenticationBloc authenticationBloc = AuthenticationBloc();
@@ -28,22 +28,13 @@ class  AuthenticationBloc
   Stream<AuthenticationState> mapEventToState(
     AuthenticationEvent event,
   ) async* {
-    print('AuthenticationBloc ==>> 0');
-    if (event is AuthenticationStarted) {
-      print('AuthenticationBloc ==>> 1');
-    }
-    print('AuthenticationBloc ==>> 2');
+    if (event is AuthenticationStarted) {}
 
     if (event is AuthenticationLoggedIn) {
-      print('AuthenticationBloc ==>> 3');
-
       yield AuthenticationInProgress();
-      print('AuthenticationBloc ==>> 4');
 
-      yield AuthenticationSuccess(displayName: event.token);
-      print('AuthenticationBloc ==>> 5');
+      yield AuthenticationSuccess(token: event.token);
     }
-    print('AuthenticationBloc ==>> 6');
 
 //    if (event is AuthenticationLoggedOut) {
 //      print('AuthenticationBloc ==>> 7');

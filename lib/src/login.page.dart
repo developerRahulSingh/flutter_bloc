@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fvbank/src/home.page.dart';
 import 'package:fvbank/themes/common.theme.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:user_repository/user_repository.dart';
 
 import 'bloc/authentationBloc/authenticationBloc.dart';
+import 'bloc/authentationBloc/authenticationState.dart';
+import 'home.page.dart';
 import 'loginBloc.dart';
 import 'loginEvent.dart';
 
@@ -105,15 +106,17 @@ class _LoginFormState extends State<LoginForm> {
         password: _controllerPassword.text,
       ),
     );
-    _nextScreen();
+
+//    _nextScreen();
   }
 
-  _nextScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => HomePage()),
-    );
-  }
+//
+//  _nextScreen() {
+//    Navigator.push(
+//      context,
+//      MaterialPageRoute(builder: (context) => ),
+//    );
+//  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,109 +150,114 @@ class _LoginFormState extends State<LoginForm> {
       ).show();
     }
 
-    return Stack(
-      children: <Widget>[
-        new SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Image.asset(
-                  'images/Frame.png',
-                  color: Colors.black,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 32, bottom: 16),
-                child: Text(
-                  'Login',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: CommonTheme.TEXT_SIZE_LARGE,
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, state) {
+        if (state is AuthenticationSuccess) {
+          return HomePage(token: state.token);
+        }
+        return Stack(
+          children: <Widget>[
+            new SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Image.asset(
+                      'images/Frame.png',
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: TextField(
-                  focusNode: focusUsername,
-                  controller: _controllerUserName,
-                  textInputAction: TextInputAction.next,
-                  onSubmitted: (v) {
-                    FocusScope.of(context).requestFocus(focus);
-                  },
-                  onChanged: (text) {
-                    username = text;
-                    _singInStatusChange();
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "USERNAME",
+                  Padding(
+                    padding: EdgeInsets.only(top: 32, bottom: 16),
+                    child: Text(
+                      'Login',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: CommonTheme.TEXT_SIZE_LARGE,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                child: TextField(
-                  controller: _controllerPassword,
-                  focusNode: focus,
-                  onSubmitted: (v) {
-                    if (username == '' || username.length <= 6) {
-                      _onAlertOpen(
-                        'Please enter valid user name.',
-                      );
-                    } else if (password == '') {
-                      _onAlertOpen(
-                        'Please enter valid password.',
-                      );
-                    } else {
-                      if (_signInStatus == true) {
-                        _signInClicked();
-                      }
-                    }
-                  },
-                  onChanged: (text) {
-                    password = text;
-                    _singInStatusChange();
-                  },
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "PASSWORD",
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: TextField(
+                      focusNode: focusUsername,
+                      controller: _controllerUserName,
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (v) {
+                        FocusScope.of(context).requestFocus(focus);
+                      },
+                      onChanged: (text) {
+                        username = text;
+                        _singInStatusChange();
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: "USERNAME",
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              SizedBox(
-                height: 48,
-                width: MediaQuery.of(context).size.width * 0.35,
-                child: FlatButton(
-                  disabledColor: Colors.grey,
-                  disabledTextColor: Colors.white,
-                  onPressed: _signInClicked,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 32),
+                    child: TextField(
+                      controller: _controllerPassword,
+                      focusNode: focus,
+                      onSubmitted: (v) {
+                        if (username == '' || username.length <= 6) {
+                          _onAlertOpen(
+                            'Please enter valid user name.',
+                          );
+                        } else if (password == '') {
+                          _onAlertOpen(
+                            'Please enter valid password.',
+                          );
+                        } else {
+                          if (_signInStatus == true) {
+                            _signInClicked();
+                          }
+                        }
+                      },
+                      onChanged: (text) {
+                        password = text;
+                        _singInStatusChange();
+                      },
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: "PASSWORD",
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 48,
+                    width: MediaQuery.of(context).size.width * 0.35,
+                    child: FlatButton(
+                      disabledColor: Colors.grey,
+                      disabledTextColor: Colors.white,
+                      onPressed: _signInClicked,
 //                  onPressed: _signInStatus
 //                      ? () async {
 //                          _signInClicked();
 //                        }
 //                      : null,
-                  child: Text(
-                    'SIGN IN',
-                    style: TextStyle(
-                      fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                      child: Text(
+                        'SIGN IN',
+                        style: TextStyle(
+                          fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                        ),
+                      ),
+                      color: Color.fromRGBO(17, 17, 68, 1),
+                      textColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
                     ),
                   ),
-                  color: Color.fromRGBO(17, 17, 68, 1),
-                  textColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: GestureDetector(
-                  onTap: () => _onAlertOpen('Forgot Password'),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: GestureDetector(
+                      onTap: () => _onAlertOpen('Forgot Password'),
 //                        onTap: () {
 //                          Navigator.push(
 //                            context,
@@ -257,25 +265,8 @@ class _LoginFormState extends State<LoginForm> {
 //                                builder: (context) => OTPComponent()),
 //                          );
 //                        },
-                  child: new Text(
-                    "Forget Password",
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: CommonTheme.COLOR_PRIMARY,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: Align(
-                    alignment: FractionalOffset.bottomCenter,
-                    child: InkWell(
-                      onTap: () => _onAlertOpen('Need Help'),
                       child: new Text(
-                        "Need Help?",
+                        "Forget Password",
                         style: TextStyle(
                           decoration: TextDecoration.underline,
                           color: CommonTheme.COLOR_PRIMARY,
@@ -284,16 +275,35 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                     ),
                   ),
-                ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: Align(
+                        alignment: FractionalOffset.bottomCenter,
+                        child: InkWell(
+                          onTap: () => _onAlertOpen('Need Help'),
+                          child: new Text(
+                            "Need Help?",
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                              color: CommonTheme.COLOR_PRIMARY,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        new Align(
-          child: loadingIndicator,
-          alignment: FractionalOffset.center,
-        ),
-      ],
+            ),
+            new Align(
+              child: loadingIndicator,
+              alignment: FractionalOffset.center,
+            ),
+          ],
+        );
+      },
     );
   }
 }

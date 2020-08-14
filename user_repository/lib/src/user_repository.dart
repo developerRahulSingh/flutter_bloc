@@ -1,48 +1,43 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
+import 'package:user_repository/src/interfaces/api_interfaces.dart';
 
 class UserRepository {
+  String sessionToken = "";
+  String accountType = "";
+
+// Login and get sessionToken
   Future<String> authenticate({
     @required String username,
     @required String password,
   }) async {
-    String basicAuth =
-        'Basic ' + base64Encode(utf8.encode('$username:$password'));
-    Map<String, String> headers = {
-      'authorization': basicAuth,
-      'accept': 'application/json',
-      'channel': 'mobile'
-    };
-    final body = {};
-    var uri = Uri.parse('https://dev.backend.fvbank.us/api/auth/session');
-    uri = uri
-        .replace(queryParameters: <String, String>{'fields': 'sessionToken'});
-    final response = await http.post(uri, headers: headers, body: body);
-    print('Api call ==>> ');
-    print(response.statusCode);
-    var av = json.decode(response.body);
-    print(av['sessionToken']);
-    return av['sessionToken'];
+    var res = await APIInterfaces.loginUser(username, password);
+    print('RES:-$res');
+    sessionToken = res['sessionToken'];
+    return sessionToken;
   }
 
-  Future<void> deleteToken() async {
-    /// delete from keystore/keychain
-    await Future.delayed(Duration(seconds: 1));
-    return;
+// Get UserProfile Data
+ Future<dynamic> getUserProfile({@required String sessionToken}) async {
+    var res = await APIInterfaces.getUserProfile(sessionToken);
+    return res;
   }
 
-  Future<void> persistToken(String token) async {
-    /// write to keystore/keychain
-    await Future.delayed(Duration(seconds: 1));
-    return;
+// Get Account Data
+  Future<dynamic> getAccounts({@required String sessionToken}) async {
+    var resAccounts = await APIInterfaces.getAccounts(sessionToken);
+    var accountData = resAccounts[0];
+//    accountType = resAccounts[0]['type']['internalName'];
+////    print('AccountType ==>> $accountType');
+//    print('RES GET ACCOUNTS:-$accountData');
+    return accountData;
   }
 
-  Future<bool> hasToken() async {
-    /// read from keystore/keychain
-    await Future.delayed(Duration(seconds: 1));
-    return false;
+// Get Account Data
+  Future<dynamic> getAccountsHistory() async {
+    var resAccountsHistory =
+        await APIInterfaces.getAccountsHistory(sessionToken, accountType);
+    return resAccountsHistory;
   }
 }

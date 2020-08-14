@@ -8,12 +8,12 @@ abstract class AuthenticationState extends Equatable {
 class AuthenticationInitial extends AuthenticationState {}
 
 class AuthenticationSuccess extends AuthenticationState {
-  final String displayName;
+  final String token;
 
-  AuthenticationSuccess({this.displayName = ''});
+  AuthenticationSuccess({this.token = ''});
 
   @override
-  List<Object> get props => [displayName];
+  List<Object> get props => [token];
 
 //  @override
 //  String toString() => 'Authenticated { displayName: $displayName }';
