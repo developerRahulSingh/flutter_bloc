@@ -69,11 +69,13 @@ class _HomePageState extends State<HomePage> {
           BottomNavyBarItem(
             icon: Icon(Icons.timeline),
             title: Text(''),
+            inactiveColor: Colors.white,
             activeColor: CommonTheme.COLOR_PRIMARY,
           ),
           BottomNavyBarItem(
             icon: Icon(Icons.settings),
             title: Text(''),
+            inactiveColor: Colors.white,
             activeColor: CommonTheme.COLOR_PRIMARY,
           ),
         ],

@@ -24,11 +24,9 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardState extends State<DashboardPage> {
-//  Map userData;
   static List<dynamic> userData = [];
   static List<dynamic> accountData = [];
 
-//  var accountData;
   UserRepository userRepository;
 
   bool isLoading = false;
@@ -36,7 +34,6 @@ class _DashboardState extends State<DashboardPage> {
   Future<dynamic> fetchUserData() async {
     userRepository.getUserProfile(sessionToken: widget.token).then((value) => {
           setState(() {
-//            userData = value;
             userData.add(value);
           }),
           print("dashboard 1234 ==>> $userData")
@@ -46,7 +43,6 @@ class _DashboardState extends State<DashboardPage> {
   Future<dynamic> fetchAccountDetail() async {
     userRepository.getAccounts(sessionToken: widget.token).then((value) => {
           setState(() {
-//            accountData = value;
             accountData.add(value);
           }),
           print("dashboard 5678 ==>> $accountData")
