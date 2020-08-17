@@ -12,50 +12,22 @@ import 'package:user_repository/user_repository.dart';
 import 'component/transactionItem.component.dart';
 
 class DashboardPage extends StatefulWidget {
-  final String token;
+  var accInfo;
+  var userInfo;
 
-  DashboardPage({
-    Key key,
-    @required this.token,
-  }) : super(key: key);
+  DashboardPage({Key key, @required this.accInfo, @required this.userInfo})
+      : super(key: key);
 
   @override
   _DashboardState createState() => _DashboardState();
 }
 
 class _DashboardState extends State<DashboardPage> {
-  static List<dynamic> userData = [];
-  static List<dynamic> accountData = [];
-
-  UserRepository userRepository;
-
   bool isLoading = false;
-
-  Future<dynamic> fetchUserData() async {
-    userRepository.getUserProfile(sessionToken: widget.token).then((value) => {
-          setState(() {
-            userData.add(value);
-          }),
-          print("dashboard 1234 ==>> $userData")
-        });
-  }
-
-  Future<dynamic> fetchAccountDetail() async {
-    userRepository.getAccounts(sessionToken: widget.token).then((value) => {
-          setState(() {
-            accountData.add(value);
-          }),
-          print("dashboard 5678 ==>> $accountData")
-        });
-  }
 
   @override
   void initState() {
     super.initState();
-    userRepository = new UserRepository();
-
-    fetchUserData();
-    fetchAccountDetail();
   }
 
   handleAPIError(dynamic res) {
@@ -376,69 +348,71 @@ class _DashboardState extends State<DashboardPage> {
                 child: new Center(child: new CircularProgressIndicator())),
           )
         : new Container();
-//    print("Return==>> ${userData.length} ");
+    print("Return==>> ${widget.userInfo['display']} ");
     return MaterialApp(
       home: Scaffold(
         backgroundColor: CommonTheme.COLOR_PRIMARY,
-        body: Stack(
-          children: <Widget>[
-            SafeArea(
-              bottom: false,
-              child: Column(
+        body: widget.userInfo != null
+            ? Stack(
                 children: <Widget>[
-                  for (var userDetail in userData)
-                    for (var accountDetail in accountData)
-                      Container(
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              userDetail['display'],
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
-                              ),
-                            ),
-                            Text(
-                              userDetail['group']['name'] + ' Account',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: CommonTheme.TEXT_SIZE_SMALL,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 27),
-                              child: Text(
-                                'Current Balance',
+                  SafeArea(
+                    bottom: false,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              Text(
+                                widget.userInfo['display'],
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                                  fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: Text(
-                                accountDetail['currency']['symbol'] +
-                                    ' ' +
-                                    accountDetail['status']['availableBalance'],
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: CommonTheme.TEXT_SIZE_EXTRA_LARGE,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
+//                        Text(
+//                          widget.userInfo['group']['name'] + ' Account',
+//                          style: TextStyle(
+//                            color: Colors.white,
+//                            fontSize: CommonTheme.TEXT_SIZE_SMALL,
+//                          ),
+//                        ),
+//                        Padding(
+//                          padding: const EdgeInsets.only(top: 27),
+//                          child: Text(
+//                            'Current Balance',
+//                            style: TextStyle(
+//                              color: Colors.white,
+//                              fontSize: CommonTheme.TEXT_SIZE_SMALL,
+//                            ),
+//                          ),
+//                        ),
+//                        Padding(
+//                          padding: const EdgeInsets.only(bottom: 16),
+//                          child: Text(
+//                            widget.accInfo['currency']['symbol'] +
+//                                ' ' +
+//                                widget.accInfo['status']['availableBalance'],
+//                            style: TextStyle(
+//                                color: Colors.white,
+//                                fontSize: CommonTheme.TEXT_SIZE_EXTRA_LARGE,
+//                                fontWeight: FontWeight.bold),
+//                          ),
+//                        ),
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
+                    ),
+                  ),
+                  new Align(
+                    child: loadingIndicator,
+                    alignment: FractionalOffset.center,
+                  ),
                 ],
+              )
+            : Center(
+                child: CircularProgressIndicator(),
               ),
-            ),
-            new Align(
-              child: loadingIndicator,
-              alignment: FractionalOffset.center,
-            ),
-          ],
-        ),
       ),
     );
   }

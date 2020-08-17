@@ -49,7 +49,7 @@ class APIInterfaces {
         ]
       });
       final response = await http.get(uri, headers: headers);
-//      print('User data API Call ==>> ${jsonDecode(response.body)}');
+      print('User data API Call ==>> ${jsonDecode(response.body)}');
       return jsonDecode(response.body);
     } catch (e) {
       print(e);
