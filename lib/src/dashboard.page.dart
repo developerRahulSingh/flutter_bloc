@@ -1,21 +1,25 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:fvbank/src/component/transactionDetail.component.dart';
 import 'package:fvbank/src/login.page.dart';
 import 'package:fvbank/themes/common.theme.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:user_repository/user_repository.dart';
 
+import 'component/transactionDetail.component.dart';
 import 'component/transactionItem.component.dart';
 
 class DashboardPage extends StatefulWidget {
-  var accInfo;
-  var userInfo;
+  final String token;
+  final dynamic accInfo;
+  final dynamic userInfo;
+  final dynamic accHistory;
 
-  DashboardPage({Key key, @required this.accInfo, @required this.userInfo})
+  DashboardPage(
+      {Key key,
+      @required this.token,
+      @required this.accInfo,
+      @required this.userInfo,
+      @required this.accHistory})
       : super(key: key);
 
   @override
@@ -24,10 +28,12 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardState extends State<DashboardPage> {
   bool isLoading = false;
+  UserRepository userRepository;
 
   @override
   void initState() {
     super.initState();
+    this.userRepository = new UserRepository();
   }
 
   handleAPIError(dynamic res) {
@@ -43,40 +49,12 @@ class _DashboardState extends State<DashboardPage> {
     }
   }
 
-  Future<dynamic> _getTransactionDetailAPI(
-      String sessionToken, String transactionNumber) async {
-    try {
-      Map<String, String> headers = {
-        'session-token': sessionToken,
-        'accept': 'application/json',
-        'channel': 'mobile'
-      };
-      final body = {};
-      var uri = Uri.parse(
-          'https://dev.backend.fvbank.us/api/transfers/$transactionNumber');
-      uri = uri.replace(queryParameters: <String, dynamic>{'fields': []});
-      final response = await http.get(uri, headers: headers);
-
-      if (jsonDecode(response.body)['code'] == 'loggedOut' &&
-          response.statusCode == 401) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-        );
-        return;
-      }
-      print('DDDDD:-${response.body}');
-      return jsonDecode(response.body);
-    } catch (e) {
-      print(e);
-    }
-  }
-
   _transactionItemPressed(
       context, int index, dynamic data, String sessionToken) async {
     dynamic transactionNumber = data[index]['transactionNumber'];
-    var resTransactionDetails =
-        await _getTransactionDetailAPI(sessionToken, transactionNumber);
+    var resTransactionDetails = await userRepository.getTransactionDetail(
+        sessionToken: widget.token, transactionNumber: transactionNumber);
+
     print('RES TRANSACTION DETAILS:-$resTransactionDetails');
 
     String to = '';
@@ -199,8 +177,10 @@ class _DashboardState extends State<DashboardPage> {
 
   Future<String> _getName(
       context, int index, dynamic data, String sessionToken) async {
-    dynamic resTransactionDetails = await _getTransactionDetailAPI(
-        sessionToken, data[index]['transactionNumber']);
+    var resTransactionDetails = await userRepository.getTransactionDetail(
+        sessionToken: widget.token,
+        transactionNumber: data[index]['transactionNumber']);
+
     print('RES TRANSACTION DETAILS:-$resTransactionDetails');
     String transactionTitle = '';
     if (resTransactionDetails['from']['kind'] == 'user') {
@@ -369,37 +349,42 @@ class _DashboardState extends State<DashboardPage> {
                                   fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
                                 ),
                               ),
-//                        Text(
-//                          widget.userInfo['group']['name'] + ' Account',
-//                          style: TextStyle(
-//                            color: Colors.white,
-//                            fontSize: CommonTheme.TEXT_SIZE_SMALL,
-//                          ),
-//                        ),
-//                        Padding(
-//                          padding: const EdgeInsets.only(top: 27),
-//                          child: Text(
-//                            'Current Balance',
-//                            style: TextStyle(
-//                              color: Colors.white,
-//                              fontSize: CommonTheme.TEXT_SIZE_SMALL,
-//                            ),
-//                          ),
-//                        ),
-//                        Padding(
-//                          padding: const EdgeInsets.only(bottom: 16),
-//                          child: Text(
-//                            widget.accInfo['currency']['symbol'] +
-//                                ' ' +
-//                                widget.accInfo['status']['availableBalance'],
-//                            style: TextStyle(
-//                                color: Colors.white,
-//                                fontSize: CommonTheme.TEXT_SIZE_EXTRA_LARGE,
-//                                fontWeight: FontWeight.bold),
-//                          ),
-//                        ),
+                              Text(
+                                widget.userInfo['group']['name'] + ' Account',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 27),
+                                child: Text(
+                                  'Current Balance',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: CommonTheme.TEXT_SIZE_SMALL,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Text(
+                                  widget.accInfo['currency']['symbol'] +
+                                      ' ' +
+                                      widget.accInfo['status']
+                                          ['availableBalance'],
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize:
+                                          CommonTheme.TEXT_SIZE_EXTRA_LARGE,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ],
                           ),
+                        ),
+                        Expanded(
+                          child: _listItem(widget.accHistory, widget.token),
                         ),
                       ],
                     ),

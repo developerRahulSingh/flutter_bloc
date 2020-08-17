@@ -17,9 +17,6 @@ class APIInterfaces {
       uri = uri
           .replace(queryParameters: <String, String>{'fields': 'sessionToken'});
       final response = await http.post(uri, headers: headers, body: body);
-
-//      print(response.statusCode);
-//      print(response.body);
       return jsonDecode(response.body);
     } catch (e) {
       print(e);
@@ -110,6 +107,35 @@ class APIInterfaces {
       });
       final response = await http.get(uri, headers: headers);
 
+      return jsonDecode(response.body);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<dynamic> getTransactionDetail(
+      String sessionToken, String transactionNumber) async {
+    try {
+      Map<String, String> headers = {
+        'session-token': sessionToken,
+        'accept': 'application/json',
+        'channel': 'mobile'
+      };
+      final body = {};
+      var uri = Uri.parse(
+          'https://dev.backend.fvbank.us/api/transfers/$transactionNumber');
+      uri = uri.replace(queryParameters: <String, dynamic>{'fields': []});
+      final response = await http.get(uri, headers: headers);
+//
+//      if (jsonDecode(response.body)['code'] == 'loggedOut' &&
+//          response.statusCode == 401) {
+//        Navigator.push(
+//          context,
+//          MaterialPageRoute(builder: (context) => LoginPage()),
+//        );
+//        return;
+//      }
+      print('getTransactionDetailAPI ==>> ${response.body}');
       return jsonDecode(response.body);
     } catch (e) {
       print(e);
