@@ -7,6 +7,17 @@ import 'package:fvbank/themes/common.theme.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class MenuPage extends StatefulWidget {
+  final String token;
+  final dynamic accInfo;
+  final dynamic userInfo;
+
+  MenuPage({
+    Key key,
+    @required this.token,
+    @required this.accInfo,
+    @required this.userInfo,
+  }) : super(key: key);
+
   @override
   _MenuState createState() => _MenuState();
 }
@@ -258,12 +269,14 @@ class _MenuState extends State<MenuPage> {
                   child: CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.transparent,
-                    backgroundImage: AssetImage('images/user_fill.png'),
+                    backgroundImage: widget.userInfo != null
+                        ? NetworkImage(widget.userInfo['image']['url'])
+                        : AssetImage('images/user_fill.png'),
                   ),
                 ),
               ),
               Text(
-                'display',
+                widget.userInfo['display'],
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: CommonTheme.TEXT_SIZE_MEDIUM,
@@ -272,7 +285,7 @@ class _MenuState extends State<MenuPage> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Text(
-                  'group name Account',
+                  widget.userInfo['group']['name'] + ' Account',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: CommonTheme.TEXT_SIZE_SMALL,
@@ -293,7 +306,12 @@ class _MenuState extends State<MenuPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => AccountDetailsPage()),
+                                  builder: (context) => AccountDetailsPage(
+                                        accInfo: widget.accInfo,
+                                        userInfo: widget.userInfo != null
+                                            ? widget.userInfo
+                                            : null,
+                                      )),
                             );
                           },
                           child: Text(

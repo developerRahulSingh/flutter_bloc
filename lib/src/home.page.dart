@@ -79,7 +79,11 @@ class _HomePageState extends State<HomePage> {
               userInfo: userData != null ? userData : null,
               accHistory: accHistoryData != null ? accHistoryData : null,
             )
-          : MenuPage(),
+          : MenuPage(
+              token: widget.token,
+              accInfo: accountData,
+              userInfo: userData != null ? userData : null,
+            ),
       bottomNavigationBar: BottomNavyBar(
         selectedIndex: _currentIndex,
         backgroundColor: CommonTheme.COLOR_DARK,

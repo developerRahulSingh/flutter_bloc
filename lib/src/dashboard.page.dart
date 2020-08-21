@@ -328,7 +328,6 @@ class _DashboardState extends State<DashboardPage> {
                 child: new Center(child: new CircularProgressIndicator())),
           )
         : new Container();
-    print("Return==>> ${widget.userInfo['display']} ");
     return MaterialApp(
       home: Scaffold(
         backgroundColor: CommonTheme.COLOR_PRIMARY,
@@ -368,17 +367,19 @@ class _DashboardState extends State<DashboardPage> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 16),
-                                child: Text(
-                                  widget.accInfo['currency']['symbol'] +
-                                      ' ' +
-                                      widget.accInfo['status']
-                                          ['availableBalance'],
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize:
-                                          CommonTheme.TEXT_SIZE_EXTRA_LARGE,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                                child: widget.accInfo == null
+                                    ? null
+                                    : Text(
+                                        widget.accInfo['currency']['symbol'] +
+                                            ' ' +
+                                            widget.accInfo['status']
+                                                ['availableBalance'],
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: CommonTheme
+                                                .TEXT_SIZE_EXTRA_LARGE,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                               ),
                             ],
                           ),
@@ -396,7 +397,9 @@ class _DashboardState extends State<DashboardPage> {
                 ],
               )
             : Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                ),
               ),
       ),
     );
